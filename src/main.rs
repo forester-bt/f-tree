@@ -2,9 +2,11 @@ use std::path::PathBuf;
 
 use clap::{arg, value_parser, Arg, ArgAction, ArgMatches, Command};
 use forester_rs::runtime::action::Tick;
-use forester_rs::runtime::builder::builtin::BuilderBuiltInActions;
+use forester_rs::runtime::builder::builtin::{builtin_actions_file};
 use forester_rs::runtime::builder::ForesterBuilder;
+use forester_rs::runtime::builder::ros_nav::ros_actions_file;
 use forester_rs::runtime::RtResult;
+use forester_rs::runtime_tree_default;
 use forester_rs::simulator::builder::SimulatorBuilder;
 use forester_rs::tree::TreeError;
 use forester_rs::visualizer::Visualizer;
@@ -18,7 +20,7 @@ fn cli() -> Command {
         .about("A console utility to interact with Forester")
         .subcommand_required(true)
         .arg_required_else_help(true)
-        .version("0.2.1")
+        .version("0.2.2")
         .arg(
             Arg::new("debug")
                 .short('d')
@@ -26,7 +28,8 @@ fn cli() -> Command {
                 .help("Print debug logs")
                 .action(ArgAction::SetTrue)
         )
-        .subcommand(Command::new("print-std").about("Print the list of std actions from 'import std::actions'"))
+        .subcommand(Command::new("print-std-actions").about("Print the list of std actions from 'import std::actions'"))
+        .subcommand(Command::new("print-ros-nav2").about("Print the list of ros actions from 'import ros::nav2'"))
         .subcommand(
             Command::new("sim")
                 .about(r#"Runs simulation. Expects a simulation profile"#)
@@ -42,7 +45,14 @@ fn cli() -> Command {
                 .arg(arg!(-r --root <ROOT> "a path to a root folder. The <PWD> folder by default"))
                 .arg(arg!(-m --main <MAIN> "a path to a main file. The 'main.tree' by default"))
                 .arg(arg!(-t --tree <TREE> "a root in a main file. If there is only one root it takes by default"))
-
+        )
+        .subcommand(
+            Command::new("nav2")
+                .about(r#"Convert to the xml compatable format of nav ros2."#)
+                .arg(arg!(-o --output <OUTPUT> "a file for xml. If  no, the name from the main file will be taken."))
+                .arg(arg!(-r --root <ROOT> "a path to a root folder. The <PWD> folder by default"))
+                .arg(arg!(-m --main <MAIN> "a path to a main file. The 'main.tree' by default"))
+                .arg(arg!(-t --tree <TREE> "a root in a main file. If there is only one root it takes by default"))
         )
 }
 
@@ -101,6 +111,7 @@ fn sim(matches: &ArgMatches) {
         }
     }
 }
+
 fn viz(matches: &ArgMatches) {
     let pwd = std::env::current_dir().expect("the current directory is presented");
 
@@ -123,8 +134,43 @@ fn viz(matches: &ArgMatches) {
         }
     }
 }
+
+fn export_to_nav(matches: &ArgMatches) {
+    let pwd = std::env::current_dir().expect("the current directory is presented");
+
+    let root = match matches.get_one::<String>("root") {
+        Some(root) => buf(root.as_str(), pwd),
+        None => pwd,
+    };
+
+    let (rts, output) = runtime_tree_default(
+        root,
+        matches.get_one::<String>("main"),
+        matches.get_one::<String>("tree"),
+        matches.get_one::<String>("output"),
+        "xml".to_string(),
+    ).map_err(|e|{
+        error!("the export is failed due to '{:?}'", e);
+    }).expect("the runtime tree is built");
+
+    match rts.tree.to_ros_nav(output) {
+        Ok(_) => {
+            info!("the result is successfully saved to the given file.")
+        }
+        Err(e) => {
+            error!("the export is failed due to '{:?}'", e);
+        }
+    }
+}
+
+
 fn std() {
-    let f = BuilderBuiltInActions::builtin_actions_file();
+    let f = builtin_actions_file();
+    info!("{f}");
+}
+
+fn ros_nav2() {
+    let f = ros_actions_file();
     info!("{f}");
 }
 
@@ -147,8 +193,14 @@ fn main() {
         Some(("vis", args)) => {
             viz(args);
         }
-        Some(("print-std", _)) => {
+        Some(("print-std-actions", _)) => {
             std();
+        }
+        Some(("print-ros-nav2", _)) => {
+            ros_nav2();
+        }
+        Some(("nav2", args)) => {
+            export_to_nav(args);
         }
         Some((e, _)) => {
             error!("the command '{e}' does not match the expected commands. ");

@@ -17,7 +17,7 @@ it can be effectively used in the game, ai, robotic areas, or anywhere where the
 
 The details can be found in the [book](https://besok.github.io/forester/api.html)
 
-The commands:
+The commands can be:
 
 ```shell
 Commands:
@@ -50,3 +50,8 @@ Options:
 
 ```
 
+The full list of commands can be obtained by the command:
+
+```shell
+forester -h
+```

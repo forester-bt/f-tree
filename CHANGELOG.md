@@ -10,4 +10,6 @@
   * add print-std to print std file
 * **`0.1.8`**
   * the sim profile is optional
+* **`0.2.2`**
+  * add the export operation to ros nav 
  
