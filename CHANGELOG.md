@@ -12,4 +12,6 @@
   * the sim profile is optional
 * **`0.2.2`**
   * add the export operation to ros nav 
+* **`0.2.4`**
+  * add any type 
  
