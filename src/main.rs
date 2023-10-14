@@ -20,7 +20,7 @@ fn cli() -> Command {
         .about("A console utility to interact with Forester")
         .subcommand_required(true)
         .arg_required_else_help(true)
-        .version("0.2.3")
+        .version("0.2.4")
         .arg(
             Arg::new("debug")
                 .short('d')
