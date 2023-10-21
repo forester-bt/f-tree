@@ -9,7 +9,7 @@ homepage = "https://github.com/besok/forester"
 repository = "https://github.com/besok/forester"
 
 [dependencies]
-clap = { version = "4.3.11", features = ["derive"] }
+clap = { version = "4.4.4", features = ["derive","cargo"] }
 forester-rs = "0.2.8"
 log = "0.4"
 env_logger = "0.10.0"

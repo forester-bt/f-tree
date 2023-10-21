@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use clap::{arg, value_parser, Arg, ArgAction, ArgMatches, Command};
+use clap::{arg, value_parser, Arg, ArgAction, ArgMatches, Command, crate_version};
 use forester_rs::runtime::action::Tick;
 use forester_rs::runtime::builder::builtin::{builtin_actions_file};
 use forester_rs::runtime::builder::ForesterBuilder;
@@ -20,7 +20,7 @@ fn cli() -> Command {
         .about("A console utility to interact with Forester")
         .subcommand_required(true)
         .arg_required_else_help(true)
-        .version("0.2.3")
+        .version(crate_version!())
         .arg(
             Arg::new("debug")
                 .short('d')
