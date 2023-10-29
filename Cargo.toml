@@ -2,7 +2,7 @@
 name = "f-tree"
 description = "the cli app to execute the commands from forester."
 authors = ["BorisZhguchev <zhguchev@hotmail.com>"]
-version = "0.2.4"
+version = "0.2.5"
 edition = "2021"
 license-file="LICENSE"
 homepage = "https://github.com/forester-bt/f-tree"
@@ -10,6 +10,6 @@ repository = "https://github.com/forester-bt/f-tree"
 
 [dependencies]
 clap = { version = "4.4.4", features = ["derive","cargo"] }
-forester-rs = "0.2.8"
+forester-rs = "0.3.0"
 log = "0.4"
 env_logger = "0.10.0"

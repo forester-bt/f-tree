@@ -14,4 +14,9 @@
   * add the export operation to ros nav 
 * **`0.2.4`**
   * add any type 
+* * **`0.2.5`**
+  * new version of Forester
+    * fix bugs and improvements
+    * add daemons
+    * add built in abilities (less, stop_daemon)
  
