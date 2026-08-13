@@ -20,3 +20,5 @@
     * add daemons
     * add built in abilities (less, stop_daemon)
  
+* * **`0.3.0`**
+   * update the dependency

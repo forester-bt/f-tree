@@ -6,16 +6,16 @@
 
 ## About
 
-Forester represents a framework that provides the toolkit to perform the effective task orckestrations.
+Forester is a framework that provides a toolkit to perform effective task orchestration.
 The tasks can be performed synchronously or asynchronously, locally or remotely.
 Forester takes care of the correct performance and distribution of the tasks.
-The main concept of the framework is the flow based on the behavior trees
-it can be effectively used in the game, ai, robotic areas, or anywhere where the workflow engine can be applied.
+The main concept of the framework is the flow based on behavior trees.
+It can be effectively used in game, AI, and robotics areas, or anywhere a workflow engine can be applied.
 
 
 # The console utility to work with [Forester](https://github.com/forester-bt/forester)
 
-The details can be found in the [book](https://besok.github.io/forester/api.html)
+The details can be found in the [book](https://forester-bt.github.io/learn/)
 
 The commands can be:
 
@@ -42,7 +42,7 @@ Options:
 
 ```shell
 Options:
-  -o, --output <OUTPUT>  a file for svg. If  no, the name from the main file will be taken.
+  -o, --output <OUTPUT>  a file for svg. If none, the name from the main file will be taken.
   -r, --root <ROOT>      a path to a root folder. The <PWD> folder by default
   -m, --main <MAIN>      a path to a main file. The 'main.tree' by default
   -t, --tree <TREE>      a root in a main file. If there is only one root it takes by default
