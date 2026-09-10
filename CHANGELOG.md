@@ -31,3 +31,6 @@
 * * **`0.4.1`**
    * update the dependency
 
+* * **`0.4.2`**
+   * update the dependency
+
