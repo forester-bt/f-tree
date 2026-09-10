@@ -22,3 +22,5 @@
  
 * * **`0.3.0`**
    * update the dependency
+* * **`0.3.1`**
+   * update the dependency
