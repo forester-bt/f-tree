@@ -512,7 +512,7 @@ dependencies = [
 
 [[package]]
 name = "f-tree"
-version = "0.4.1"
+version = "0.4.2"
 dependencies = [
  "clap",
  "env_logger",
@@ -540,9 +540,9 @@ checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
 name = "forester-rs"
-version = "0.7.1"
+version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0421157b4cec5142fa8c29c954a5a95b2c1802ad3de4944a80f01a510fc2e672"
+checksum = "e1ffe785f870fc4edd9f30017e8bb14e1e232e75b760be8e47818a71402424b1"
 dependencies = [
  "axum",
  "chrono",
