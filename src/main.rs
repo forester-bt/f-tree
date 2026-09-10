@@ -1,10 +1,10 @@
 use std::path::PathBuf;
 
 use clap::{arg, crate_version, Arg, ArgAction, ArgMatches, Command};
+use forester_rs::runner::config::RunProfile;
+use forester_rs::runner::Runner;
 use forester_rs::runtime::builder::builtin::builtin_actions_file;
-use forester_rs::runtime::builder::ros_nav::ros_actions_file;
 use forester_rs::runtime::builder::ForesterBuilder;
-use forester_rs::runtime_tree_default;
 use forester_rs::simulator::builder::SimulatorBuilder;
 use forester_rs::visualizer::Visualizer;
 use log::LevelFilter;
@@ -34,6 +34,14 @@ fn cli() -> Command {
                 .arg(arg!(-r --root <ROOT> "a path to a root folder. The <PWD> folder by default"))
                 .arg(arg!(-m --main <MAIN> "a path to a main file. The 'main.tree' by default"))
                 .arg(arg!(-t --tree <TREE> "a root in a main file. If there is only one root it takes by default"))
+        )
+        .subcommand(
+            Command::new("run")
+                .about(r#"Runs the tree from the file system. Accepts an optional run profile in yaml"#)
+                .arg(arg!(-p --profile <PATH> "a path to a run profile in yaml. The default profile if empty"))
+                .arg(arg!(-r --root <ROOT> "a path to a root folder. The <PWD> folder by default"))
+                .arg(arg!(-m --main <MAIN> "a path to a main file. The 'main.tree' by default"))
+                .arg(arg!(-t --tree <TREE> "a root in a main file. The 'main' by default"))
         )
         .subcommand(
             Command::new("vis")
@@ -101,6 +109,51 @@ fn sim(matches: &ArgMatches) {
     }
 }
 
+fn run(matches: &ArgMatches) {
+    let pwd = std::env::current_dir().expect("the current directory is present");
+
+    let root = match matches.get_one::<String>("root") {
+        Some(root) => buf(root.as_str(), pwd),
+        None => pwd,
+    };
+
+    let main_file = matches
+        .get_one::<String>("main")
+        .map(|v| v.as_str())
+        .unwrap_or("main.tree");
+    let main_file = buf(main_file, root.clone());
+
+    let main_tree = matches
+        .get_one::<String>("tree")
+        .map(|v| v.to_string())
+        .unwrap_or("main".to_string());
+
+    let profile = match matches.get_one::<String>("profile") {
+        Some(p) => match RunProfile::from_file(buf(p, root)) {
+            Ok(profile) => profile,
+            Err(err) => {
+                error!("the run profile can not be loaded due to '{:?}'", err);
+                return;
+            }
+        },
+        None => RunProfile::default(),
+    };
+
+    match Runner::build(main_file, main_tree, profile) {
+        Ok(mut runner) => match runner.run() {
+            Ok(r) => {
+                info!("the process is finished with the result: {:?}", r)
+            }
+            Err(err) => {
+                error!("a runtime error occurred: {:?}", err)
+            }
+        },
+        Err(err) => {
+            error!("a build error occurred: {:?}", err)
+        }
+    }
+}
+
 fn viz(matches: &ArgMatches) {
     let pwd = std::env::current_dir().expect("the current directory is present");
 
@@ -148,6 +201,12 @@ fn main() {
         Some(("vis", args)) => {
             viz(args);
         }
+        Some(("run", args)) => {
+            run(args);
+        }
+        Some(("print-std-actions", _)) => {
+            std();
+        }
         Some((e, _)) => {
             error!("the command '{e}' does not match any expected command.");
         }
@@ -165,10 +224,10 @@ mod tests {
     fn cli_exposes_expected_subcommands() {
         let cmd = cli();
         let names: Vec<&str> = cmd.get_subcommands().map(|s| s.get_name()).collect();
-        for expected in ["sim", "vis"] {
+        for expected in ["sim", "vis", "run", "print-std-actions"] {
             assert!(names.contains(&expected), "missing subcommand '{expected}'");
         }
-        assert_eq!(names.len(), 3);
+        assert_eq!(names.len(), 4);
     }
 
     #[test]
@@ -252,6 +311,38 @@ mod tests {
         assert_eq!(args.get_one::<String>("root").unwrap(), "/root");
         assert_eq!(args.get_one::<String>("main").unwrap(), "other.tree");
         assert_eq!(args.get_one::<String>("tree").unwrap(), "main_root");
+    }
+
+    #[test]
+    fn run_parses_all_arguments() {
+        let matches = cli().get_matches_from([
+            "f-tree",
+            "run",
+            "-p",
+            "profile.yaml",
+            "-r",
+            "/root",
+            "-m",
+            "other.tree",
+            "-t",
+            "main_root",
+        ]);
+        let (name, args) = matches.subcommand().unwrap();
+        assert_eq!(name, "run");
+        assert_eq!(args.get_one::<String>("profile").unwrap(), "profile.yaml");
+        assert_eq!(args.get_one::<String>("root").unwrap(), "/root");
+        assert_eq!(args.get_one::<String>("main").unwrap(), "other.tree");
+        assert_eq!(args.get_one::<String>("tree").unwrap(), "main_root");
+    }
+
+    #[test]
+    fn run_arguments_are_optional() {
+        let matches = cli().get_matches_from(["f-tree", "run"]);
+        let (_, args) = matches.subcommand().unwrap();
+        assert!(args.get_one::<String>("profile").is_none());
+        assert!(args.get_one::<String>("root").is_none());
+        assert!(args.get_one::<String>("main").is_none());
+        assert!(args.get_one::<String>("tree").is_none());
     }
 
     #[test]
