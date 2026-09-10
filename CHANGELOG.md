@@ -28,3 +28,6 @@
    * add the `run` command on top of the Forester runner (an optional yaml run profile)
    * wire the `print-std-actions` command to its handler
    * remove utility methods for now
+* * **`0.4.1`**
+   * update the dependency
+
