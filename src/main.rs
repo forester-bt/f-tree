@@ -119,9 +119,8 @@ fn run(matches: &ArgMatches) {
 
     let main_file = matches
         .get_one::<String>("main")
-        .map(|v| v.as_str())
-        .unwrap_or("main.tree");
-    let main_file = buf(main_file, root.clone());
+        .map(|v| v.to_string())
+        .unwrap_or("main.tree".to_string());
 
     let main_tree = matches
         .get_one::<String>("tree")
@@ -129,7 +128,7 @@ fn run(matches: &ArgMatches) {
         .unwrap_or("main".to_string());
 
     let profile = match matches.get_one::<String>("profile") {
-        Some(p) => match RunProfile::from_file(buf(p, root)) {
+        Some(p) => match RunProfile::from_file(buf(p, root.clone())) {
             Ok(profile) => profile,
             Err(err) => {
                 error!("the run profile can not be loaded due to '{:?}'", err);
@@ -139,7 +138,7 @@ fn run(matches: &ArgMatches) {
         None => RunProfile::default(),
     };
 
-    match Runner::build(main_file, main_tree, profile) {
+    match Runner::build(root, main_file, main_tree, profile) {
         Ok(mut runner) => match runner.run() {
             Ok(r) => {
                 info!("the process is finished with the result: {:?}", r)
